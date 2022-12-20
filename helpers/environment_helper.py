@@ -1,6 +1,6 @@
 import os.path as osPath
 from dotenv import dotenv_values as dotenvVals
-from pathlib import Path as libPath
+from pathlib import Path as LibPath
 from icecream import ic
 
 # ============================================================================ #
@@ -20,8 +20,8 @@ class EnvironmentHelper:
     @env_file.setter
     def env_file(self, val: str) -> None:
         if val is None:
-            val = osPath.join(libPath(__file__).parent.parent, '.env')
-        if not libPath(val).is_file():
+            val = osPath.join(LibPath(__file__).parent.parent, '.env')
+        if not LibPath(val).is_file():
             raise FileNotFoundError(f'Unable to locate .env file: {val}')
         self._env_file = val
 
