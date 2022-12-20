@@ -1,3 +1,6 @@
+################################################################################
+## Template .gitignore for python projects
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -11,7 +14,6 @@ __pycache__/
 build/
 develop-eggs/
 dist/
-downloads/
 eggs/
 .eggs/
 lib/
@@ -127,3 +129,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Other stuff
+*.DS_Store
+_junk/
+
+################################################################################
+## dyersville .gitignore
+
+data/baseball_databank/downloads*
+_scratch/
