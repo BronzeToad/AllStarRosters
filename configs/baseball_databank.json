@@ -1,113 +1,113 @@
 [
   {
-      "fileName": "AllstarFull",
-      "fileType": "core"
+    "fileName": "AllstarFull",
+    "fileType": "core"
   },
   {
-      "fileName": "Appearances",
-      "fileType": "core"
+    "fileName": "Appearances",
+    "fileType": "core"
   },
   {
-      "fileName": "AwardsManagers",
-      "fileType": "contrib"
+    "fileName": "AwardsManagers",
+    "fileType": "contrib"
   },
   {
-      "fileName": "AwardsPlayers",
-      "fileType": "contrib"
+    "fileName": "AwardsPlayers",
+    "fileType": "contrib"
   },
   {
-      "fileName": "AwardsShareManagers",
-      "fileType": "contrib"
+    "fileName": "AwardsShareManagers",
+    "fileType": "contrib"
   },
   {
-      "fileName": "AwardsSharePlayers",
-      "fileType": "contrib"
+    "fileName": "AwardsSharePlayers",
+    "fileType": "contrib"
   },
   {
-      "fileName": "Batting",
-      "fileType": "core"
+    "fileName": "Batting",
+    "fileType": "core"
   },
   {
-      "fileName": "BattingPost",
-      "fileType": "core"
+    "fileName": "BattingPost",
+    "fileType": "core"
   },
   {
-      "fileName": "CollegePlaying",
-      "fileType": "contrib"
+    "fileName": "CollegePlaying",
+    "fileType": "contrib"
   },
   {
-      "fileName": "Fielding",
-      "fileType": "core"
+    "fileName": "Fielding",
+    "fileType": "core"
   },
   {
-      "fileName": "FieldingOF",
-      "fileType": "core"
+    "fileName": "FieldingOF",
+    "fileType": "core"
   },
   {
-      "fileName": "FieldingOFsplit",
-      "fileType": "core"
+    "fileName": "FieldingOFsplit",
+    "fileType": "core"
   },
   {
-      "fileName": "FieldingPost",
-      "fileType": "core"
+    "fileName": "FieldingPost",
+    "fileType": "core"
   },
   {
-      "fileName": "HallOfFame",
-      "fileType": "contrib"
+    "fileName": "HallOfFame",
+    "fileType": "contrib"
   },
   {
-      "fileName": "HomeGames",
-      "fileType": "core"
+    "fileName": "HomeGames",
+    "fileType": "core"
   },
   {
-      "fileName": "Managers",
-      "fileType": "core"
+    "fileName": "Managers",
+    "fileType": "core"
   },
   {
-      "fileName": "ManagersHalf",
-      "fileType": "core"
+    "fileName": "ManagersHalf",
+    "fileType": "core"
   },
   {
-      "fileName": "Parks",
-      "fileType": "core"
+    "fileName": "Parks",
+    "fileType": "core"
   },
   {
-      "fileName": "People",
-      "fileType": "core"
+    "fileName": "People",
+    "fileType": "core"
   },
   {
-      "fileName": "Pitching",
-      "fileType": "core"
+    "fileName": "Pitching",
+    "fileType": "core"
   },
   {
-      "fileName": "PitchingPost",
-      "fileType": "core"
+    "fileName": "PitchingPost",
+    "fileType": "core"
   },
   {
-      "fileName": "Salaries",
-      "fileType": "contrib"
+    "fileName": "Salaries",
+    "fileType": "contrib"
   },
   {
-      "fileName": "Schools",
-      "fileType": "contrib"
+    "fileName": "Schools",
+    "fileType": "contrib"
   },
   {
-      "fileName": "SeriesPost",
-      "fileType": "core"
+    "fileName": "SeriesPost",
+    "fileType": "core"
   },
   {
-      "fileName": "Teams",
-      "fileType": [
-          "core",
-          "upstream"
-      ]
+    "fileName": "Teams",
+    "fileType": [
+      "core",
+      "upstream"
+    ]
   },
   {
-      "fileName": "TeamsFranchises",
-      "fileType": "core"
+    "fileName": "TeamsFranchises",
+    "fileType": "core"
   },
   {
-      "fileName": "TeamsHalf",
-      "fileType": "core"
+    "fileName": "TeamsHalf",
+    "fileType": "core"
   }
 ]
