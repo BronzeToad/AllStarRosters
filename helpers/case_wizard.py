@@ -33,7 +33,13 @@ class CaseWizard:
 # ============================================================================ #
 
     def camel_to_snake(self) -> str:
-        return self.input_string    # TODO
+        val = ''
+        for l in self.input_string:
+            if l.isupper():
+                val += '_' + l.lower()
+            else:
+                val += l
+        return val
     
     def camel_to_pascal(self) -> str:
         return self.input_string    # TODO
@@ -243,3 +249,7 @@ class CaseWizard:
 
 if __name__ == '__main__':
     print('\n\n-------------------------- Executing as standalone script...')
+    
+    tst_string = 'camelCamelCamel'
+    
+    print(CaseWizard.convert(tst_string, 'camelCase', 'snake_case'))
