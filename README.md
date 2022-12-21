@@ -7,18 +7,14 @@ if so, what performance metrics are predictive of roster selection?
 
 Hypothesis: There is no direct causal relationship between player performance and MLB All-Star Roster selection. 
 
+python_version >= 3.10
+
 ---
 ## .env variables
 
 WORKSPACE_DIR=_<full_path_to_workspace_directory>_
 
 PYTHONPATH=${WORKSPACE_DIR}
-
-GOOGLE_APPLICATION_CREDENTIALS=_<full_path_to_google_cloud--application_default_credentials.json>_
-
-GCP_PROJECT=_<google_cloud_platform--project_id>_
-
-GCP_BUCKET=dyersville-dev_<google_cloud_platform--storage-bucket>_
 
 ---
 
