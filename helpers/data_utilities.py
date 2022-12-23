@@ -1,29 +1,28 @@
-import json
-import os.path as osPath
-
-from pathlib import Path as LibPath
-
-from helpers.environment_helper import EnvironmentHelper as EnvHelper
-
 # ============================================================================ #
 
-ROOT_DIR = EnvHelper().workspace_dir
-
-
 def force_extension(filename: str, extension: str) -> str:
-    ext = LibPath(filename).suffix
-    if ext == '':
+    from pathlib import Path
+    suffix = Path(filename).suffix
+
+    if suffix == '':
         filename = f'{filename}.{extension}'
-    elif extension not in ext and ext not in extension:
-        raise ValueError(f'Invalid filename extension {ext}. Expected {extension}.')
+    elif extension not in suffix and suffix not in extension:
+        raise ValueError(f'Invalid filename extension {suffix}. Expected {extension}.')
+
     return filename
 
 
-def get_json(folder: str, filename: str) -> dict:
-    filename = force_extension(filename, 'json')
-    filepath = f'{osPath.join(folder, filename)}'
+# ============================================================================ #
 
-    if LibPath(filepath).is_file():
+def get_json(folder: str, filename: str) -> dict:
+    import json
+    import os
+    from pathlib import Path
+
+    filename = force_extension(filename, 'json')
+    filepath = f'{os.path.join(folder, filename)}'
+
+    if Path(filepath).is_file():
         with open(filepath, 'r') as file:
             data = json.load(file)
     else:
@@ -34,6 +33,8 @@ def get_json(folder: str, filename: str) -> dict:
 
     return data
 
+
+# ============================================================================ #
 
 def get_filename_from_url(url: str) -> str:
     filename = url.split('/')[-1]
