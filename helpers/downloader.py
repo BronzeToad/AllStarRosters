@@ -4,7 +4,7 @@ from pathlib import Path
 import requests
 
 import helpers.utilities as dataUtils
-from helpers.env_helper import EnvironmentHelper as EnvHelper
+from helpers.env_helper import EnvHelper
 
 
 # ============================================================================ #

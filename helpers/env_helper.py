@@ -1,8 +1,16 @@
 import os
-from dotenv import dotenv_values
+from enum import Enum
 from pathlib import Path
+
+from dotenv import dotenv_values
 from icecream import ic
-from helpers.enum_factory import EnvFile
+
+
+# ============================================================================ #
+
+class EnvFile(Enum):
+    SECRET = '.env'
+    PYTHON = '.env-py'
 
 
 # ============================================================================ #
