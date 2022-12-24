@@ -1,56 +1,88 @@
-import os.path as osPath
-
-from helpers.env_helper import EnvironmentHelper as EnvHelper
+from helpers.env_helper import EnvHelper, EnvFile
+import helpers.utilities as toadUtils
+import os
 from helpers.downloader import Downloader
-import helpers.utilities as dataUtils
+from pprint import pprint
 
-from icecream import ic
+# ============================================================================ #
+
+SOURCE_URL = 'https://raw.githubusercontent.com/chadwickbureau/baseballdatabank/master'
+ROOT_DIR = EnvHelper(EnvFile.PYTHON).get_env_value('PYTHONPATH')
+CONFIG = toadUtils.get_json(folder=os.path.join(ROOT_DIR, 'configs'),
+                            filename='baseball_databank')
+DATA_DIR = os.path.join(ROOT_DIR, 'data', 'baseball-databank')
 
 
 # ============================================================================ #
 
-class BaseballDataBank:
-    SOURCE_URL = 'https://raw.githubusercontent.com/chadwickbureau/baseballdatabank/master'
-    ROOT_DIR = EnvHelper().workspace_dir
-    CONFIG = dataUtils.get_json(folder=osPath.join(ROOT_DIR, 'configs'),
-                                filename='baseball_databank')
+def get_valid_filenames() -> list:
+    _names = []
 
-    # ============================================================================ #
+    for _key in CONFIG:
+        _name = _key['fileName']
+        _names.append(_name)
 
-    def __init__(self, filenames: list = None):
-        self.VALID_FILENAMES = None
-        self.filenames = filenames
+    return _names
 
-    @property
-    def VALID_FILENAMES(self) -> list:
-        return self._VALID_FILENAMES
 
-    @VALID_FILENAMES.setter
-    def VALID_FILENAMES(self, val: list) -> None:
-        val = []
-        for _key in self.CONFIG:
-            _name = _key['fileName']
-            val.append(_name)
-        self._VALID_FILENAMES = val
+def get_download_filenames(filenames: list = None) -> list:
+    _valid_filenames = get_valid_filenames()
 
-    @property
-    def filenames(self) -> list:
-        return self._filenames
+    if filenames is None:
+        _files = _valid_filenames
+    else:
+        _files = [filenames] if isinstance(filenames, str) else filenames
+        _invalid = []
 
-    @filenames.setter
-    def filenames(self, val) -> None:
-        if val is None:
-            val = self.VALID_FILENAMES
-        else:
-            val = [val] if isinstance(val, str) else val
-            _invalid_filenames = []
-            for _name in val:
-                if _name not in self.VALID_FILENAMES:
-                    _invalid_filenames.append(_name)
-                    val.remove(_name)
-            if len(_invalid_filenames) > 0:
-                print(f'Removed {len(_invalid_filenames)} invalid filenames...')
-                ic(_invalid_filenames)
-        self._filenames = val
+        for _file in _files:
+            if _file not in _valid_filenames:
+                _invalid.append(_file)
+                _files.remove(_file)
+
+            if len(_invalid) > 0:
+                print(f'Removed {len(_invalid)} invalid filenames...')
+                pprint(_invalid)
+
+    if len(_files) < 1:
+        raise RuntimeError(f'No valid download filenames...')
+    else:
+        return _files
+
+
+def get_download_urls(download_files: list) -> list:
+    _urls = []
+
+    for _file in download_files:
+        for _item in CONFIG:
+            if _file == _item['fileName']:
+                _type = _item['fileType']
+
+                if isinstance(_type, list):
+                    for _t in _type:
+                        _urls.append(f'{SOURCE_URL}/{_t}/{_file}.csv')
+                else:
+                    _urls.append(f'{SOURCE_URL}/{_type}/{_file}.csv')
+
+    return _urls
 
 # ============================================================================ #
+
+
+# ============================================================================ #
+
+def get_baseball_databank_data(filenames: list = None) -> None:
+    _filenames = get_download_filenames(filenames)
+    _urls = get_download_urls(_filenames)
+
+    for _url in _urls:
+        Downloader.download(url=_url,
+                            save_dir=os.path.join(DATA_DIR, 'raw'),
+                            ignore_errors=True)
+
+
+# ============================================================================ #
+
+if __name__ == '__main__':
+    print('\n\n-------------------------- Executing as standalone script...')
+
+    get_baseball_databank_data()
