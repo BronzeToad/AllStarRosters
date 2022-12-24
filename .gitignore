@@ -1,5 +1,6 @@
-data/baseball_databank/downloads*
-_scratch/
+.scratch/
+data/*/raw*
+.idea/
 
 # ============================================================================ #
 
@@ -106,13 +107,14 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+environment/.env
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+!environment/.env-*
 
 # Spyder project settings
 .spyderproject
@@ -134,4 +136,3 @@ dmypy.json
 
 # Other stuff
 *.DS_Store
-_junk/
