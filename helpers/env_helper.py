@@ -1,9 +1,9 @@
 import os
 from enum import Enum
 from pathlib import Path
+from pprint import pprint
 
 from dotenv import dotenv_values
-from pprint import pprint
 
 
 # ============================================================================ #

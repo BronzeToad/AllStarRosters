@@ -1,8 +1,9 @@
-from pandas import read_csv, DataFrame
 import json
 import os
 from pathlib import Path
 from typing import Union
+
+from pandas import read_csv, DataFrame
 
 
 # ============================================================================ #

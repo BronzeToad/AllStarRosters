@@ -6,6 +6,7 @@ import requests
 import helpers.utilities as toadUtils
 from helpers.env_helper import EnvHelper, EnvFile
 
+
 # ============================================================================ #
 
 
@@ -128,6 +129,7 @@ class Downloader:
         print(f'Content saved? : {content_saved}')
 
         return True if status_good and content_saved else False
+
 
 # ============================================================================ #
 
