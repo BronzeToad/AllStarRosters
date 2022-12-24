@@ -3,8 +3,8 @@ from pathlib import Path
 
 import requests
 
-import helpers.data_utilities as dataUtils
-from helpers.environment_helper import EnvironmentHelper as EnvHelper
+import helpers.utilities as dataUtils
+from helpers.env_helper import EnvironmentHelper as EnvHelper
 
 
 # ============================================================================ #

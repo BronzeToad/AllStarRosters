@@ -1,8 +1,8 @@
 import os.path as osPath
 
-from helpers.environment_helper import EnvironmentHelper as EnvHelper
+from helpers.env_helper import EnvironmentHelper as EnvHelper
 from helpers.downloader import Downloader
-import helpers.data_utilities as dataUtils
+import helpers.utilities as dataUtils
 
 from icecream import ic
 
