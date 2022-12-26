@@ -3,14 +3,15 @@ from pathlib import Path
 
 import requests
 
-import helpers.utilities as dataUtils
-from helpers.env_helper import EnvHelper
+import helpers.utilities as toadUtils
+from helpers.environment_helper import EnvHelper, EnvFile
 
 
 # ============================================================================ #
 
 
 class Downloader:
+    ROOT_DIR = EnvHelper(EnvFile.PYTHON).root_dir
 
     def __init__(self,
                  url: str,
@@ -40,14 +41,11 @@ class Downloader:
             return True
 
     @staticmethod
-    def save_response_content(response: requests.Response, save_dir: str, filename: str):
+    def save_response_content(response: requests.Response, save_dir: str, filename: str) -> bool:
         save_path = os.path.join(save_dir, filename)
         with open(save_path, 'wb') as file:
             file.write(response.content)
-        if Path(save_path).is_file():
-            print(f'{filename} downloaded to {save_dir}')
-        else:
-            print(f'{save_path} does not exist...')
+        return True if Path(save_path).is_file() else False
 
     # ============================================================================ #
 
@@ -68,7 +66,7 @@ class Downloader:
         if Path(val).is_dir():
             self._save_dir = val
         else:
-            _abs_path = os.path.join(EnvHelper().workspace_dir, val)
+            _abs_path = os.path.join(self.ROOT_DIR, val)
             if not Path(_abs_path).is_dir():
                 os.makedirs(_abs_path)
             self._save_dir = _abs_path
@@ -80,7 +78,7 @@ class Downloader:
     @filename.setter
     def filename(self, val):
         if val is None:
-            self._filename = dataUtils.get_filename_from_url(self.url)
+            self._filename = toadUtils.get_filename_from_url(self.url)
         else:
             self._filename = val
 
@@ -108,17 +106,29 @@ class Downloader:
     @classmethod
     def download(cls,
                  url: str,
-                 save_dir: str = None,
+                 save_dir: str,
                  filename: str = None,
-                 ignore_errors: bool = False) -> None:
+                 ignore_errors: bool = False) -> bool:
 
         doot = cls(url, save_dir, filename, ignore_errors)
 
-        if doot.check_response_status(response=doot.response,
-                                      ignore_errors=doot.ignore_errors):
-            doot.save_response_content(response=doot.response,
-                                       save_dir=doot.save_dir,
-                                       filename=doot.filename)
+        status_good = doot.check_response_status(response=doot.response,
+                                                 ignore_errors=doot.ignore_errors)
+
+        if status_good:
+            content_saved = doot.save_response_content(response=doot.response,
+                                                       save_dir=doot.save_dir,
+                                                       filename=doot.filename)
+        else:
+            content_saved = False
+
+        print('\n--------------------')
+        print(f'Filename : {doot.filename}')
+        print(f'URL : {doot.url}')
+        print(f'Status good? : {status_good}')
+        print(f'Content saved? : {content_saved}')
+
+        return True if status_good and content_saved else False
 
 
 # ============================================================================ #

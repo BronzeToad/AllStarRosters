@@ -1,7 +1,13 @@
+import json
+import os
+from pathlib import Path
+
+import pandas as pd
+
+
 # ============================================================================ #
 
 def force_extension(filename: str, extension: str) -> str:
-    from pathlib import Path
     suffix = Path(filename).suffix
 
     if suffix == '':
@@ -15,10 +21,6 @@ def force_extension(filename: str, extension: str) -> str:
 # ============================================================================ #
 
 def get_json(folder: str, filename: str) -> dict:
-    import json
-    import os
-    from pathlib import Path
-
     filename = force_extension(filename, 'json')
     filepath = f'{os.path.join(folder, filename)}'
 
@@ -39,6 +41,22 @@ def get_json(folder: str, filename: str) -> dict:
 def get_filename_from_url(url: str) -> str:
     filename = url.split('/')[-1]
     return url.split('/')[-2] if filename == '' else filename
+
+
+# ============================================================================ #
+
+def get_csv(folder: str, filename: str) -> pd.DataFrame:
+    filename = force_extension(filename, 'csv')
+    filepath = os.path.join(folder, filename)
+
+    if Path(filepath).is_file():
+        df = pd.read_csv(filepath)
+        print(f'Loaded {filename} into space.'
+              f'Dataframe rows: {df.shape[0]}, Dataframe columns: {df.shape[-1]}')
+    else:
+        raise FileNotFoundError(f'{filename} not found in {folder}.')
+
+    return df
 
 
 # ============================================================================ #

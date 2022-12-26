@@ -1,9 +1,9 @@
 import os
 from enum import Enum
 from pathlib import Path
+from pprint import pprint
 
 from dotenv import dotenv_values
-from icecream import ic
 
 
 # ============================================================================ #
@@ -16,7 +16,7 @@ class EnvFile(Enum):
 # ============================================================================ #
 
 class EnvHelper:
-    ENV_DIR: str = os.path.join(Path(__file__).parent.parent, 'environment')
+    ENV_DIR = os.path.join(Path(__file__).parent.parent, 'environment')
 
     def __init__(self, env_file: EnvFile):
         self.env_file = env_file
@@ -66,10 +66,11 @@ if __name__ == '__main__':
     
     tst = EnvHelper(EnvFile.PYTHON)
 
-    ic(tst.ENV_DIR)
-    ic(tst.env_file)
-    ic(tst.env_path)
-    ic(tst.env_vals)
-    ic(tst.get_env_value('WORKSPACE_DIR'))
-    ic(tst.get_env_value('PYTHONPATH'))
+    print(f'ENV_DIR : {tst.ENV_DIR}')
+    print(f'env_file : {tst.env_file}')
+    print(f'env_path : {tst.env_path}')
+    print('env_vals : ')
+    pprint(tst.env_vals)
+    print(f"get_env_value(WORKSPACE_DIR) : {tst.get_env_value('WORKSPACE_DIR')}")
+    print(f"get_env_value(PYTHONPATH) : {tst.get_env_value('PYTHONPATH')}")
     
