@@ -1,9 +1,8 @@
 import json
 import os
 from pathlib import Path
-from typing import Union
 
-from pandas import read_csv, DataFrame
+import pandas as pd
 
 
 # ============================================================================ #
@@ -46,40 +45,18 @@ def get_filename_from_url(url: str) -> str:
 
 # ============================================================================ #
 
-def get_csv(folder: str, filename: str) -> DataFrame:
+def get_csv(folder: str, filename: str) -> pd.DataFrame:
     filename = force_extension(filename, 'csv')
     filepath = os.path.join(folder, filename)
 
     if Path(filepath).is_file():
-        df = read_csv(filepath)
+        df = pd.read_csv(filepath)
         print(f'Loaded {filename} into space.'
               f'Dataframe rows: {df.shape[0]}, Dataframe columns: {df.shape[-1]}')
     else:
         raise FileNotFoundError(f'{filename} not found in {folder}.')
 
     return df
-
-
-# ============================================================================ #
-
-def tally(df: DataFrame, fields: Union[str, list] = None, compare: bool = False) -> None:
-    if fields is None:
-        cols = list(df.columns)
-    elif isinstance(fields, str):
-        cols = [fields]
-    elif isinstance(fields, list) and len(fields) > 0:
-        cols = fields
-    else:
-        raise RuntimeError('Something went wrong...')
-
-    print('\n\n------------------')
-    if compare:
-        tab = df.groupby(cols).size().sort_values(ascending=False).reset_index(name='count')
-        print(f'{tab}\n')
-    else:
-        for col in cols:
-            tab = df.groupby(col).size().sort_values(ascending=False).reset_index(name='count')
-            print(f'{tab}\n')
 
 
 # ============================================================================ #
