@@ -65,6 +65,7 @@ def get_download_urls(download_files: list) -> list:
 
     return _urls
 
+
 # ============================================================================ #
 
 def get_baseball_databank_data(filenames: list = None) -> None:
