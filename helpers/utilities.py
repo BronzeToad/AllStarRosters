@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 import pandas as pd
-
+from typing import Union
 
 # ============================================================================ #
 
@@ -51,12 +51,28 @@ def get_csv(folder: str, filename: str) -> pd.DataFrame:
 
     if Path(filepath).is_file():
         df = pd.read_csv(filepath)
-        print(f'Loaded {filename} into space.'
-              f'Dataframe rows: {df.shape[0]}, Dataframe columns: {df.shape[-1]}')
+        print(f'Dataframe rows: {df.shape[0]}, Dataframe columns: {df.shape[-1]}')
     else:
         raise FileNotFoundError(f'{filename} not found in {folder}.')
 
     return df
+
+
+# ============================================================================ #
+
+def prant(printme: Union[list, dict]) -> None:
+
+    if isinstance(printme, list):
+        print('\nPrinting list...')
+        [print(p) for p in printme]
+
+    elif isinstance(printme, dict):
+        print('\nPrinting dictionary...')
+        for key, val in printme.items():
+            print(f'{key}: {val}')
+
+    else:
+        raise TypeError(f'Invalid type: {type(printme)}...')
 
 
 # ============================================================================ #

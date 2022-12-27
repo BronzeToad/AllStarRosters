@@ -6,16 +6,13 @@ import pandas as pd
 # ============================================================================ #
 
 def tally(dataframe: pd.DataFrame,
-          column: str = None,
-          columns: list[str] = None,
+          columns: Union[str, list],
           compare: bool = False) -> None:
 
-    if column is None and columns is None:
-        cols = list(dataframe.columns)
-    elif column is None and len(columns) > 0:
+    if isinstance(columns, str):
+        cols = [columns]
+    elif isinstance(columns, list) and len(columns) > 0:
         cols = columns
-    elif columns is None:
-        cols = [column]
     else:
         raise RuntimeError('Something went wrong...')
 
@@ -39,8 +36,30 @@ def copy(dataframe: pd.DataFrame) -> pd.DataFrame:
 
 # ============================================================================ #
 
-def add_column(dataframe_a: pd.DataFrame, dataframe_b: pd.DataFrame) -> pd.DataFrame:
+def concat(dataframe_a: pd.DataFrame, dataframe_b: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([dataframe_a, dataframe_b], axis=1)
+
+
+# ============================================================================ #
+
+def drop(dataframe: pd.DataFrame,
+         columns: Union[str, list]) -> pd.DataFrame:
+    df = copy(dataframe)
+
+    if isinstance(columns, str):
+        cols = [columns]
+    elif isinstance(columns, list) and len(columns) > 0:
+        cols = columns
+    else:
+        raise RuntimeError('Something went wrong...')
+
+    for col in cols:
+        if col in list(df.columns):
+            df.drop(columns=[col], inplace=True)
+        else:
+            print(f"Column '{col}' does not exist...")
+
+    return df
 
 
 # ============================================================================ #
