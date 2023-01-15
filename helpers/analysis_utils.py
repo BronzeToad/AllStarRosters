@@ -4,13 +4,16 @@ from matplotlib import pyplot
 from scipy.stats import pearsonr
 
 
-# ============================================================================ #
+# =================================================================================================================== #
 
-def scatterplot(dataframe: pd.DataFrame,
-                metric_x: str,
-                metric_y: str,
-                plot_title: str = None,
-                plot_size: tuple[int, int] = None) -> None:
+def scatterplot(
+        dataframe: pd.DataFrame,
+        metric_x: str,
+        metric_y: str,
+        plot_title: str = None,
+        plot_size: tuple[int, int] = None
+) -> None:
+
     if plot_size is None:
         pyplot.figure(figsize=(8, 8))
     else:
@@ -25,25 +28,27 @@ def scatterplot(dataframe: pd.DataFrame,
         plt.set(title=plot_title)
 
 
-# ============================================================================ #
+def corr_value(
+        dataframe: pd.DataFrame,
+        metric_a: str,
+        metric_b: str,
+        num_digits: int = None
+) -> float:
 
-def corr_value(dataframe: pd.DataFrame,
-               metric_a: str,
-               metric_b: str,
-               num_digits: int = None) -> float:
     corr, _ = pearsonr(dataframe[metric_a], dataframe[metric_b])
     ndigits = 3 if num_digits is None else num_digits
     return round(corr, ndigits)
 
 
-# ============================================================================ #
-
-def corr_matrix(dataframe: pd.DataFrame,
-                plot_title: str = None,
-                plot_size: tuple[int, int] = None,
-                plt_square: bool = True,
-                plt_annot: bool = True,
-                plt_cbar: bool = True) -> None:
+def corr_matrix(
+        dataframe: pd.DataFrame,
+        plot_title: str = None,
+        plot_size: tuple[int, int] = None,
+        plt_square: bool = True,
+        plt_annot: bool = True,
+        plt_cbar: bool = True
+) -> None:
+    
     if plot_size is None:
         pyplot.figure(figsize=(8, 8))
     else:
@@ -64,7 +69,7 @@ def corr_matrix(dataframe: pd.DataFrame,
         plt.set(title=plot_title)
 
 
-# ============================================================================ #
+# =================================================================================================================== #
 
 if __name__ == '__main__':
     print('\n\n-------------------------- Executing as standalone script...')
