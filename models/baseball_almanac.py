@@ -3,7 +3,7 @@ from enum import Enum
 import numpy as np
 import pandas as pd
 
-from helpers.environment_helper import EnvHelper, EnvFile
+from helpers.environment_helper import EnvironmentHelper as EnvHelper, EnvFile
 
 # ============================================================================ #
 
@@ -20,10 +20,12 @@ class MovingRangeCalc(Enum):
 
 # ============================================================================ #
 
-def get_moving_range(dataframe: pd.DataFrame,
-                     column: str,
-                     calculation: MovingRangeCalc,
-                     window_size: int = None) -> list:
+def get_moving_range(
+        dataframe: pd.DataFrame,
+        column: str,
+        calculation: MovingRangeCalc,
+        window_size: int = None
+) -> list:
     """ Function to get moving/rolling range for given dataframe series."""
 
     winsize = 10 if window_size is None else window_size

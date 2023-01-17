@@ -2,12 +2,12 @@ import os
 from pathlib import Path
 from enum import Enum, auto
 import requests
+from typing import Optional
 
 import helpers.toad_utils as toadUtils
-from helpers.environment_helper import EnvironmentHelper as EnvHelper
-from helpers.environment_helper import EnvFile
+from helpers.environment_helper import EnvironmentHelper as EnvHelper, EnvFile
 
-
+import json
 # =================================================================================================================== #
 
 
@@ -16,23 +16,22 @@ class ResponseResult(Enum):
     SUCCESS = auto()
     UNKNOWN = auto()
 
+
 class DownloadHelper:
 
     def __init__(
         self,
         url: str,
         save_dir: str,
-        filename: str = None,
-        ignore_errors: bool = False
+        filename: str = None
     ):
         self.url = url
         self.save_dir = save_dir
         self.filename = filename
-        self.ignore_errors = ignore_errors
-        self.response: requests.Response = None
-        self.payload = None         # TODO: check type
-        self.status_code = None     # TODO: check type
-        self.result: ResponseResult = ResponseResult.UNKNOWN
+        self.response = None
+        self.payload = None
+        self.status_code = None
+        self.result = ResponseResult.UNKNOWN
         self._post_init()
 
 
@@ -46,13 +45,12 @@ class DownloadHelper:
         self.response = requests.get(self.url)
         self.status_code = self._get_status()
         self._set_result()
-
         if self.result == ResponseResult.SUCCESS:
-            self.payload = self.response.json()
-            self.save_response_content()
-            print('blah blah')
+            self.payload = self.response.content
+            self._save_content()
+            print(f'Content from {self.url} downloaded successfully.')
         else:
-            print('blah blah')
+            print(f'Request failed with status code {self.status_code}.')
 
 
     def _get_save_dir(self) -> str:
@@ -65,12 +63,8 @@ class DownloadHelper:
             return _abs_path
 
 
-
     def _get_status(self):
-        try:
-            return self.response.status_code
-        finally:
-            return 999
+        return self.response.status_code
 
 
     def _set_result(self) -> None:
@@ -85,71 +79,45 @@ class DownloadHelper:
             self.result = ResponseResult.UNKNOWN
 
 
-    def save_response_content(self): pass   # TODO
+    def _save_content(self):
+        _path = os.path.join(self.save_dir, self.filename)
+        with open(_path, 'wb') as file:
+            file.write(self.payload)
+            file.close()
 
-
-
-
-
-# =================================================================================================================== #
-
-    # ============================================================================ #
-
-    @staticmethod
-    def check_response_status(response: requests.Response, ignore_errors: bool = False) -> bool:
-        if response.status_code != 200:
-            if ignore_errors:
-                print(f'Unable to download content from {response.url}\n.'
-                      f'Request failed with status code: {response.status_code}\n')
-                return False
-            else:
-                raise requests.exceptions.HTTPError(f'Request failed with status code {response.status_code}...\n'
-                                                    f'Response text: {response.text}\n')
+        if Path(_path).is_file():
+            print(f'Filename {self.filename} saved successfully to {self.save_dir}.')
         else:
-            return True
-
-    @staticmethod
-    def save_response_content(response: requests.Response, save_dir: str, filename: str) -> bool:
-        save_path = os.path.join(save_dir, filename)
-        with open(save_path, 'wb') as file:
-            file.write(response.content)
-        return True if Path(save_path).is_file() else False
-
-    # ============================================================================ #
-
-
-
-    # ============================================================================ #
-
-    @classmethod
-    def download(cls,
-                 url: str,
-                 save_dir: str,
-                 filename: str = None,
-                 ignore_errors: bool = False) -> bool:
-
-        doot = cls(url, save_dir, filename, ignore_errors)
-
-        status_good = doot.check_response_status(response=doot.response,
-                                                 ignore_errors=doot.ignore_errors)
-
-        if status_good:
-            content_saved = doot.save_response_content(response=doot.response,
-                                                       save_dir=doot.save_dir,
-                                                       filename=doot.filename)
-        else:
-            content_saved = False
-
-        print('\n--------------------')
-        print(f'Filename : {doot.filename}')
-        print(f'URL : {doot.url}')
-        print(f'Status good? : {status_good}')
-        print(f'Content saved? : {content_saved}')
-
-        return True if status_good and content_saved else False
+            print(f'Error saving filename {self.filename} to {self.save_dir}...')
 
 
 # =================================================================================================================== #
 
 if __name__ == '__main__':
     print('\n\n-------------------------- Executing as standalone script...')
+
+    URL = ('https://raw.githubusercontent.com/BronzeToad/AllStarRosters/1.2.1/'
+           'data/baseball-almanac/all_star_game_tv_stats.csv')
+
+    ROOT_DIR = EnvHelper(EnvFile.PYTHON).get_env_value('PYTHONPATH')
+    DATA_DIR = os.path.join(ROOT_DIR, 'data', 'baseball-almanac')
+
+    tst = DownloadHelper(url=URL, save_dir=DATA_DIR)
+
+    from icecream import ic
+
+    ic(tst.url)
+    ic(tst.save_dir)
+    ic(tst.filename)
+    ic(tst.response)
+    ic(tst.payload)
+    ic(tst.status_code)
+    ic(tst.result)
+    ic(tst.root_dir)
+    ic(tst.save_dir)
+
+    tst.download()
+    ic(tst.result)
+    ic(tst.response)
+    ic(tst.status_code)
+    ic(tst.payload)
