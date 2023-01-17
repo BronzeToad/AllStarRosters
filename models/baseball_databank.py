@@ -1,7 +1,7 @@
 from helpers.environment_helper import EnvHelper, EnvFile
-import helpers.utilities as toadUtils
+import helpers.toad_utils as toadUtils
 import os
-from helpers.downloader import Downloader
+from helpers.download_helper import Downloader
 from pprint import pprint
 
 # ============================================================================ #
@@ -64,8 +64,6 @@ def get_download_urls(download_files: list) -> list:
                     _urls.append(f'{SOURCE_URL}/{_type}/{_file}.csv')
 
     return _urls
-
-# ============================================================================ #
 
 
 # ============================================================================ #
