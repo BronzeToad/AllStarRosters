@@ -8,6 +8,8 @@ import helpers.toad_utils as toadUtils
 from helpers.environment_helper import EnvironmentHelper as EnvHelper, EnvFile
 
 import json
+
+# TODO: review - may need updating/fixing after lost work
 # =================================================================================================================== #
 
 
@@ -94,30 +96,4 @@ class DownloadHelper:
 # =================================================================================================================== #
 
 if __name__ == '__main__':
-    print('\n\n-------------------------- Executing as standalone script...')
-
-    URL = ('https://raw.githubusercontent.com/BronzeToad/AllStarRosters/1.2.1/'
-           'data/baseball-almanac/all_star_game_tv_stats.csv')
-
-    ROOT_DIR = EnvHelper(EnvFile.PYTHON).get_env_value('PYTHONPATH')
-    DATA_DIR = os.path.join(ROOT_DIR, 'data', 'baseball-almanac')
-
-    tst = DownloadHelper(url=URL, save_dir=DATA_DIR)
-
-    from icecream import ic
-
-    ic(tst.url)
-    ic(tst.save_dir)
-    ic(tst.filename)
-    ic(tst.response)
-    ic(tst.payload)
-    ic(tst.status_code)
-    ic(tst.result)
-    ic(tst.root_dir)
-    ic(tst.save_dir)
-
-    tst.download()
-    ic(tst.result)
-    ic(tst.response)
-    ic(tst.status_code)
-    ic(tst.payload)
+    print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")

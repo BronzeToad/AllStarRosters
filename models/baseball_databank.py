@@ -4,15 +4,16 @@ import os
 from helpers.download_helper import Downloader
 from pprint import pprint
 
+# TODO: review - may need updating/fixing after lost work
 # ============================================================================ #
 
 SOURCE_URL = 'https://raw.githubusercontent.com/chadwickbureau/baseballdatabank/master'
 ROOT_DIR = EnvHelper(EnvFile.PYTHON).get_env_value('PYTHONPATH')
 CONFIG = toadUtils.get_json(folder=os.path.join(ROOT_DIR, 'configs'),
-                            filename='baseball_databank')
+                            filename='databank_files')
 DATA_DIR = os.path.join(ROOT_DIR, 'data', 'baseball-databank')
 
-
+print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")
 # ============================================================================ #
 
 def get_valid_filenames() -> list:

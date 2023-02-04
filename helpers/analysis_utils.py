@@ -3,7 +3,7 @@ import seaborn as sns
 from matplotlib import pyplot
 from scipy.stats import pearsonr
 
-
+# TODO: review - may need updating/fixing after lost work
 # =================================================================================================================== #
 
 def scatterplot(
@@ -72,4 +72,4 @@ def corr_matrix(
 # =================================================================================================================== #
 
 if __name__ == '__main__':
-    print('\n\n-------------------------- Executing as standalone script...')
+    print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")
