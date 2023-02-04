@@ -1,41 +1,61 @@
-from helpers.environment_helper import EnvHelper, EnvFile
-import helpers.toad_utils as toadUtils
+from helpers.environment_helper import EnvironmentHelper as EnvHelper, EnvFile
+import helpers.toad_utils as ToadUtils
 import os
-from helpers.download_helper import Downloader
+from helpers.download_helper import DownloadHelper
 from pprint import pprint
-
-# ============================================================================ #
-
-SOURCE_URL = 'https://raw.githubusercontent.com/chadwickbureau/baseballdatabank/master'
-ROOT_DIR = EnvHelper(EnvFile.PYTHON).get_env_value('PYTHONPATH')
-CONFIG = toadUtils.get_json(folder=os.path.join(ROOT_DIR, 'configs'),
-                            filename='baseball_databank')
-DATA_DIR = os.path.join(ROOT_DIR, 'data', 'baseball-databank')
+from typing import Union
 
 
-# ============================================================================ #
-
-def get_valid_filenames() -> list:
-    _names = []
-
-    for _key in CONFIG:
-        _name = _key['fileName']
-        _names.append(_name)
-
-    return _names
+# =================================================================================================================== #
 
 
-def get_download_filenames(filenames: list = None) -> list:
-    _valid_filenames = get_valid_filenames()
+class BaseballDatabank:
+    def __init__(
+            self,
+            source_url: str = None,
+            data_dir: str = None,
+            databank_filenames: Union[str, list] = None,
+            config_folder: str = None,
+    ):
+        self.source_url = source_url
+        self.data_dir = data_dir
+        self.databank_filenames = databank_filenames
+        self.config_folder = config_folder
+        self._post_init()
 
-    if filenames is None:
-        _files = _valid_filenames
-    else:
-        _files = [filenames] if isinstance(filenames, str) else filenames
+
+    def _post_init(self):
+        self.root_dir = EnvHelper(EnvFile.PYTHON).get_env_value('PYTHONPATH')
+        self.source_url = self.source_url or 'https://raw.githubusercontent.com/chadwickbureau/baseballdatabank/master'
+        self.data_dir = self.data_dir or os.path.join(self.root_dir, 'data', 'baseball-databank')
+        self.config_folder = self.config_folder or os.path.join(self.root_dir, 'configs')
+        self.config_filenames = ToadUtils.get_json(folder=self.config_folder, filename='databank_filenames')
+        self.config_headers = ToadUtils.get_json(folder=self.config_folder, filename='databank_headers')
+        self.filenames = self._get_databank_filenames()
+        self.urls = self._get_download_urls()
+
+
+    def download(self) -> None:
+        for _url in self.urls:
+            _save_dir = os.path.join(self.data_dir, 'raw')
+            DownloadHelper(url=_url, save_dir=_save_dir).download()
+
+
+    def _get_databank_filenames(self) -> list:
+
+        def _get_valid() -> list:
+            _names = []
+            for _key in self.config_filenames:
+                _name = _key['fileName']
+                _names.append(_name)
+            return _names
+
+        _filenames = self.databank_filenames or _get_valid()
+        _files = [_filenames] if isinstance(_filenames, str) else _filenames
         _invalid = []
 
         for _file in _files:
-            if _file not in _valid_filenames:
+            if _file not in _get_valid():
                 _invalid.append(_file)
                 _files.remove(_file)
 
@@ -43,44 +63,30 @@ def get_download_filenames(filenames: list = None) -> list:
                 print(f'Removed {len(_invalid)} invalid filenames...')
                 pprint(_invalid)
 
-    if len(_files) < 1:
-        raise RuntimeError(f'No valid download filenames...')
-    else:
-        return _files
+        if len(_files) < 1:
+            raise RuntimeError(f'No valid download filenames...')
+        else:
+            return _files
 
 
-def get_download_urls(download_files: list) -> list:
-    _urls = []
+    def _get_download_urls(self) -> list:
+        _urls = []
 
-    for _file in download_files:
-        for _item in CONFIG:
-            if _file == _item['fileName']:
-                _type = _item['fileType']
+        for _file in self.filenames:
+            for _item in self.config_filenames:
+                if _file == _item['fileName']:
+                    _type = _item['fileType']
 
-                if isinstance(_type, list):
-                    for _t in _type:
-                        _urls.append(f'{SOURCE_URL}/{_t}/{_file}.csv')
-                else:
-                    _urls.append(f'{SOURCE_URL}/{_type}/{_file}.csv')
+                    if isinstance(_type, list):
+                        for _t in _type:
+                            _urls.append(f'{self.source_url}/{_t}/{_file}.csv')
+                    else:
+                        _urls.append(f'{self.source_url}/{_type}/{_file}.csv')
 
-    return _urls
-
-
-# ============================================================================ #
-
-def get_baseball_databank_data(filenames: list = None) -> None:
-    _filenames = get_download_filenames(filenames)
-    _urls = get_download_urls(_filenames)
-
-    for _url in _urls:
-        Downloader.download(url=_url,
-                            save_dir=os.path.join(DATA_DIR, 'raw'),
-                            ignore_errors=True)
+        return _urls
 
 
-# ============================================================================ #
+# =================================================================================================================== #
 
 if __name__ == '__main__':
     print('\n\n-------------------------- Executing as standalone script...')
-
-    get_baseball_databank_data()
