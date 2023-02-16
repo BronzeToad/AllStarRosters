@@ -13,6 +13,7 @@ class EnvHelper:
     env_dir: Optional[str] = None
     env_file: Optional[str] = None
 
+
     def __post_init__(self):
         self.env_dir = self.env_dir or Path(__file__).parent.parent
         self.env_file = self.env_file or '.env'
