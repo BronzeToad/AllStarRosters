@@ -1,15 +1,14 @@
 import os
-from pathlib import Path
-from enum import Enum, auto
-import requests
-from typing import Optional
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Optional
+
+import requests
+
 import helpers.toad_utils as toadUtils
-from helpers.environment_helper import EnvironmentHelper as EnvHelper, EnvFile
+from helpers.environment_helper import EnvHelper
 
-import json
 
-# TODO: review - may need updating/fixing after lost work
 # =================================================================================================================== #
 
 @dataclass
@@ -23,7 +22,8 @@ class DownloadHelper:
 
 
     def __post_init__(self):
-        self.root_dir = EnvHelper(EnvFile.PYTHON).get_env_value('WORKSPACE_DIR')
+        EnvHelper = EnvHelper()
+        self.root_dir = EnvHelper().workspace
         self.save_dir = self._get_save_dir()
         self.filename = self.filename or toadUtils.get_url_filename(url=self.url)
 
