@@ -16,9 +16,9 @@ def scatterplot(
 
     pyplot.figure(figsize=plot_size)
     sns.set(font_scale=1)
-    plt = sns.scatterplot(data=dataframe, x=metric_x, y=metric_y)
+    _plt = sns.scatterplot(data=dataframe, x=metric_x, y=metric_y)
     _title = plot_title or f'Scatterplot : {metric_x} v. {metric_y}'
-    plt.set(title=_title)
+    _plt.set(title=_title)
 
 
 def corr_value(
@@ -28,9 +28,9 @@ def corr_value(
         num_digits: int = None
 ) -> float:
 
-    corr, _ = pearsonr(dataframe[metric_a], dataframe[metric_b])
+    _corr, _ = pearsonr(dataframe[metric_a], dataframe[metric_b])
     _ndig = num_digits or 3
-    return round(corr, _ndig)
+    return round(_corr, _ndig)
 
 
 def corr_matrix(
@@ -44,17 +44,17 @@ def corr_matrix(
     
     pyplot.figure(figsize=plot_size)
 
-    plt = sns.heatmap(data=dataframe.corr(),
-                      vmin=1, vmax=1,center=0,
-                      square=plt_square, annot=plt_annot, cbar=plt_cbar,
-                      cmap=sns.diverging_palette(20, 200, n=200))
+    _plt = sns.heatmap(data=dataframe.corr(),
+                       vmin=1, vmax=1,center=0,
+                       square=plt_square, annot=plt_annot, cbar=plt_cbar,
+                       cmap=sns.diverging_palette(20, 200, n=200))
 
-    plt.set_xticklabels(plt.get_xticklabels(),
-                        rotation=45,
-                        horizontalalignment='right')
+    _plt.set_xticklabels(_plt.get_xticklabels(),
+                         rotation=45,
+                         horizontalalignment='right')
 
     _title = plot_title or f'Correlation Matrix'
-    plt.set(title=_title)
+    _plt.set(title=_title)
 
 
 # =================================================================================================================== #

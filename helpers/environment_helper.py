@@ -43,14 +43,3 @@ class EnvHelper:
 
 if __name__ == '__main__':
     print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")
-
-    from icecream import ic
-
-    EnvHelper = EnvHelper()
-
-    ic(EnvHelper.env_dir)
-    ic(EnvHelper.env_file)
-    ic(EnvHelper.env_path)
-    ic(EnvHelper.env_dict)
-    ic(EnvHelper.workspace)
-    ic(EnvHelper.pythonpath)

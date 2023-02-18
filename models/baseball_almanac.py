@@ -1,5 +1,4 @@
 from helpers.enum_factory import MovingRangeCalc
-from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
@@ -8,29 +7,8 @@ from helpers.environment_helper import EnvHelper
 # TODO: review - may need updating/fixing after lost work
 # =================================================================================================================== #
 
-@dataclass
-class BaseballAlmanac:
-    pass
+ROOT_DIR = EnvHelper().workspace
 
-
-    def __post_init__(self):
-        self.root_dir = EnvHelper().workspace
-
-
-    def download(self):
-        pass
-
-
-    def get_moving_range(self):
-        pass
-
-
-    def get_first_last(self):
-        pass
-
-
-    def get_percent_change(self):
-        pass
 
 
 # =================================================================================================================== #
@@ -41,23 +19,22 @@ def get_moving_range(
         dataframe: pd.DataFrame,
         column: str,
         calculation: MovingRangeCalc,
-        window_size: int = None
+        window_size: int = 10
 ) -> list:
     """ Function to get moving/rolling range for given dataframe series."""
 
-    winsize = 10 if window_size is None else window_size
-    arr = dataframe[column]
+    target_array = dataframe[column]
 
-    if winsize < 2 or winsize >= len(arr):
-        raise ValueError(f'Window size must be between 2 and {len(arr)}...')
+    if window_size < 2 or window_size >= len(target_array):
+        raise ValueError(f'Window size must be between 2 and {len(target_array)}...')
 
     match calculation:
         case MovingRangeCalc.MEAN:
-            dirty_windows = pd.Series(arr).rolling(winsize).mean()
+            dirty_windows = pd.Series(target_array).rolling(window_size).mean()
         case MovingRangeCalc.MIN:
-            dirty_windows = pd.Series(arr).rolling(winsize).min()
+            dirty_windows = pd.Series(target_array).rolling(window_size).min()
         case MovingRangeCalc.MAX:
-            dirty_windows = pd.Series(arr).rolling(winsize).max()
+            dirty_windows = pd.Series(target_array).rolling(window_size).max()
         case _:
             raise RuntimeError('Something went wrong...')
 

@@ -1,3 +1,8 @@
+import json
+import os
+from pathlib import Path
+from typing import Optional, Union
+
 import pandas as pd
 
 from helpers.enum_factory import FileType
@@ -41,11 +46,6 @@ def force_extension(
         raise ValueError(f'Invalid filename extension {_suffix}. Expected {_ext}.')
     else:
         return filename.replace(extension, _ext)
-
-from typing import Optional, Union
-import os
-from pathlib import Path
-import json
 
 
 def get_file(
