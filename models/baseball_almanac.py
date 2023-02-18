@@ -1,25 +1,41 @@
-from enum import Enum
-
+from helpers.enum_factory import MovingRangeCalc
+from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from helpers.environment_helper import EnvironmentHelper as EnvHelper, EnvFile
+from helpers.environment_helper import EnvHelper
 
 # TODO: review - may need updating/fixing after lost work
-# ============================================================================ #
+# =================================================================================================================== #
 
-ROOT_DIR = EnvHelper(EnvFile.PYTHON).get_env_value('PYTHONPATH')
+@dataclass
+class BaseballAlmanac:
+    pass
 
 
-# ============================================================================ #
+    def __post_init__(self):
+        self.root_dir = EnvHelper().workspace
 
-class MovingRangeCalc(Enum):
-    MEAN = 'mean'
-    MIN = 'min'
-    MAX = 'max'
 
-print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")
-# ============================================================================ #
+    def download(self):
+        pass
+
+
+    def get_moving_range(self):
+        pass
+
+
+    def get_first_last(self):
+        pass
+
+
+    def get_percent_change(self):
+        pass
+
+
+# =================================================================================================================== #
+# =================================================================================================================== #
+
 
 def get_moving_range(
         dataframe: pd.DataFrame,
@@ -57,7 +73,6 @@ def get_moving_range(
     return clean_windows
 
 
-# ============================================================================ #
 
 def get_first_last(input_list: list) -> list:
     """ Returns first and last element of input_list as new list."""
@@ -88,7 +103,7 @@ def get_percent_change(input_list: list) -> list:
     return delta_pct
 
 
-# ============================================================================ #
+# =================================================================================================================== #
 
 if __name__ == '__main__':
-    print('\n\n-------------------------- Executing as standalone script...')
+    print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")

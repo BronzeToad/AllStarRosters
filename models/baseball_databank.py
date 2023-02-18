@@ -1,20 +1,49 @@
-from helpers.environment_helper import EnvHelper, EnvFile
+from helpers.environment_helper import EnvHelper
 import helpers.toad_utils as toadUtils
 import os
-from helpers.download_helper import Downloader
+from helpers.enum_factory import FileType
+from dataclasses import dataclass
+
+from helpers.download_helper import DownloadHelper
 from pprint import pprint
 
 # TODO: review - may need updating/fixing after lost work
-# ============================================================================ #
+# =================================================================================================================== #
+
+@dataclass
+class BaseballDatabank:
+    pass
+
+
+    def __post_init__(self):
+        self.root_dir = EnvHelper().workspace
+
+
+    def download(self):
+        pass
+
+
+    def get_valid_filenames(self):
+        pass
+
+
+    def get_download_filenames(self):
+        pass
+
+
+    def get_download_urls(self):
+        pass
+
+# =================================================================================================================== #
+# =================================================================================================================== #
 
 SOURCE_URL = 'https://raw.githubusercontent.com/chadwickbureau/baseballdatabank/master'
-ROOT_DIR = EnvHelper(EnvFile.PYTHON).get_env_value('PYTHONPATH')
+
 CONFIG = toadUtils.get_json(folder=os.path.join(ROOT_DIR, 'configs'),
                             filename='databank_files')
 DATA_DIR = os.path.join(ROOT_DIR, 'data', 'baseball-databank')
 
-print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")
-# ============================================================================ #
+
 
 def get_valid_filenames() -> list:
     _names = []
@@ -79,9 +108,7 @@ def get_baseball_databank_data(filenames: list = None) -> None:
                             ignore_errors=True)
 
 
-# ============================================================================ #
+# =================================================================================================================== #
 
 if __name__ == '__main__':
-    print('\n\n-------------------------- Executing as standalone script...')
-
-    get_baseball_databank_data()
+    print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")

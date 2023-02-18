@@ -22,7 +22,6 @@ class DownloadHelper:
 
 
     def __post_init__(self):
-        EnvHelper = EnvHelper()
         self.root_dir = EnvHelper().workspace
         self.save_dir = self._get_save_dir()
         self.filename = self.filename or toadUtils.get_url_filename(url=self.url)

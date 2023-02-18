@@ -1,15 +1,9 @@
-from enum import Enum, auto
-
 import pandas as pd
+
+from helpers.enum_factory import FileType
 
 
 # =================================================================================================================== #
-
-class FileType(Enum):
-    HTML = auto()
-    JSON = auto()
-    SQL = auto()
-
 
 def force_extension(
         filename: str,
