@@ -23,7 +23,8 @@ class DownloadHelper:
 
     def __post_init__(self):
         self.root_dir = EnvHelper().workspace
-        self.save_dir = self._get_save_dir()
+        self.save_dir = self.save_dir or 'downloads'
+        self.save_path = self._get_save_path()
         self.filename = self.filename or toadUtils.get_url_filename(url=self.url)
 
 
@@ -40,18 +41,15 @@ class DownloadHelper:
             print(f'Unable to capture content from {self.url}.')
 
 
-    def _get_save_dir(self) -> str:
-        if Path(self.save_dir).is_dir():
-            return self.save_dir
-        else:
-            _abs_path = os.path.join(self.root_dir, self.save_dir)
-            if not Path(_abs_path).is_dir():
-                os.makedirs(_abs_path)
-            return _abs_path
+    def _get_save_path(self) -> str:
+        _path = os.path.join(self.root_dir, self.save_dir)
+        if not Path(_path).is_dir():
+            os.makedirs(_path)
+        return _path
 
 
     def _save_content(self):
-        _path = os.path.join(self.save_dir, self.filename)
+        _path = os.path.join(self.save_path, self.filename)
         with open(_path, 'wb') as file:
             file.write(self.payload)
             file.close()

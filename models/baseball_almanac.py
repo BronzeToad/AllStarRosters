@@ -1,18 +1,13 @@
-from helpers.enum_factory import MovingRangeCalc
 import numpy as np
 import pandas as pd
 
+from helpers.enum_factory import MovingRangeCalc
 from helpers.environment_helper import EnvHelper
 
-# TODO: review - may need updating/fixing after lost work
+
 # =================================================================================================================== #
 
 ROOT_DIR = EnvHelper().workspace
-
-
-
-# =================================================================================================================== #
-# =================================================================================================================== #
 
 
 def get_moving_range(
@@ -23,32 +18,31 @@ def get_moving_range(
 ) -> list:
     """ Function to get moving/rolling range for given dataframe series."""
 
-    target_array = dataframe[column]
+    _array = dataframe[column]
 
-    if window_size < 2 or window_size >= len(target_array):
-        raise ValueError(f'Window size must be between 2 and {len(target_array)}...')
+    if window_size < 2 or window_size >= len(_array):
+        raise ValueError(f'Window size must be between 2 and {len(_array)}...')
 
     match calculation:
         case MovingRangeCalc.MEAN:
-            dirty_windows = pd.Series(target_array).rolling(window_size).mean()
+            _dirty_windows = pd.Series(_array).rolling(window_size).mean()
         case MovingRangeCalc.MIN:
-            dirty_windows = pd.Series(target_array).rolling(window_size).min()
+            _dirty_windows = pd.Series(_array).rolling(window_size).min()
         case MovingRangeCalc.MAX:
-            dirty_windows = pd.Series(target_array).rolling(window_size).max()
+            _dirty_windows = pd.Series(_array).rolling(window_size).max()
         case _:
             raise RuntimeError('Something went wrong...')
 
-    clean_windows = []
-    for window in dirty_windows.tolist():
+    _clean_windows = []
+    for window in _dirty_windows.tolist():
         if not np.isnan(window):
             if MovingRangeCalc == MovingRangeCalc.MEAN:
                 window = round(window, 2)
             else:
                 window = int(window)
-            clean_windows.append(window)
+            _clean_windows.append(window)
 
-    return clean_windows
-
+    return _clean_windows
 
 
 def get_first_last(input_list: list) -> list:
@@ -57,12 +51,12 @@ def get_first_last(input_list: list) -> list:
     if len(input_list) < 2:
         raise ValueError('Input list must have length >= 2...')
 
-    first_last = []
+    _first_last = []
 
     for i in [0, -1]:
-        first_last.append(input_list[i])
+        _first_last.append(input_list[i])
 
-    return first_last
+    return _first_last
 
 
 def get_percent_change(input_list: list) -> list:
@@ -71,13 +65,13 @@ def get_percent_change(input_list: list) -> list:
     if len(input_list) < 2:
         raise ValueError('Input list must have length >= 2...')
 
-    first = input_list[0]
-    last = input_list[-1]
+    _first = input_list[0]
+    _last = input_list[-1]
 
-    delta_raw = round(((first - last) / first), 2)
-    delta_pct = [np.nan, delta_raw]
+    _delta_raw = round(((_first - _last) / _first), 2)
+    _delta_pct = [np.nan, _delta_raw]
 
-    return delta_pct
+    return _delta_pct
 
 
 # =================================================================================================================== #

@@ -1,111 +1,106 @@
-from helpers.environment_helper import EnvHelper
-import helpers.toad_utils as toadUtils
 import os
-from helpers.enum_factory import FileType
 from dataclasses import dataclass
+from typing import List, Optional
 
+import helpers.toad_utils as toadUtils
 from helpers.download_helper import DownloadHelper
-from pprint import pprint
+from helpers.enum_factory import FileType
+from helpers.environment_helper import EnvHelper
 
-# TODO: review - may need updating/fixing after lost work
+
 # =================================================================================================================== #
 
 @dataclass
 class BaseballDatabank:
-    pass
+    source_url: Optional[str] = None
+    save_dir: Optional[str] = None
+    filenames: Optional[List[str]] = None
 
 
     def __post_init__(self):
         self.root_dir = EnvHelper().workspace
+        self.config = self._get_config()
+        self.source_url = self.source_url or self._get_source_url()
+        self.save_dir = self.save_dir or self._get_save_dir()
+        self.filenames = self._get_download_filenames()
+        self.download_urls = self._get_download_urls()
 
 
     def download(self):
-        pass
+        for url in self.download_urls:
+            downloader = DownloadHelper(
+                    url=url,
+                    save_dir=self.save_dir
+            )
+            downloader.download()
 
 
-    def get_valid_filenames(self):
-        pass
+    def _get_config(self) -> dict:
+        return toadUtils.get_file(
+                folder=os.path.join(self.root_dir, 'configs'),
+                filename='databank_config',
+                file_type=FileType.JSON
+        )
 
 
-    def get_download_filenames(self):
-        pass
+    def _get_source_url(self) -> str:
+        return self.config['sourceUrl']
 
 
-    def get_download_urls(self):
-        pass
+    def _get_save_dir(self) -> str:
+        _cfg = self.config['dataDir']
+        _dir = ''
 
-# =================================================================================================================== #
-# =================================================================================================================== #
+        if isinstance(_cfg, str):
+            _dir = _cfg
+        else:
+            for i in range(len(_cfg)):
+                _dir = os.path.join(_dir, _cfg[i])
 
-SOURCE_URL = 'https://raw.githubusercontent.com/chadwickbureau/baseballdatabank/master'
-
-CONFIG = toadUtils.get_json(folder=os.path.join(ROOT_DIR, 'configs'),
-                            filename='databank_files')
-DATA_DIR = os.path.join(ROOT_DIR, 'data', 'baseball-databank')
-
-
-
-def get_valid_filenames() -> list:
-    _names = []
-
-    for _key in CONFIG:
-        _name = _key['fileName']
-        _names.append(_name)
-
-    return _names
+        return _dir
 
 
-def get_download_filenames(filenames: list = None) -> list:
-    _valid_filenames = get_valid_filenames()
+    def _get_download_filenames(self) -> List[str]:
+        _valid_filenames = []
+        for f in self.config['files']:
+            _valid_filenames.append(f['fileName'])
 
-    if filenames is None:
-        _files = _valid_filenames
-    else:
-        _files = [filenames] if isinstance(filenames, str) else filenames
-        _invalid = []
+        if self.filenames is None:
+            _download_filenames = _valid_filenames
+        else:
+            _download_filenames = [self.filenames] if isinstance(self.filenames, str) else self.filenames
+            _invalid_filenames = []
 
-        for _file in _files:
-            if _file not in _valid_filenames:
-                _invalid.append(_file)
-                _files.remove(_file)
+            for file in _download_filenames:
+                if file not in _valid_filenames:
+                    _invalid_filenames.append(file)
+                    _download_filenames.remove(file)
 
-            if len(_invalid) > 0:
-                print(f'Removed {len(_invalid)} invalid filenames...')
-                pprint(_invalid)
+            if len(_invalid_filenames) > 0:
+                print(f'Removed {len(_invalid_filenames)} invalid filenames...')
+                print([f for f in _invalid_filenames])
 
-    if len(_files) < 1:
-        raise RuntimeError(f'No valid download filenames...')
-    else:
-        return _files
-
-
-def get_download_urls(download_files: list) -> list:
-    _urls = []
-
-    for _file in download_files:
-        for _item in CONFIG:
-            if _file == _item['fileName']:
-                _type = _item['fileType']
-
-                if isinstance(_type, list):
-                    for _t in _type:
-                        _urls.append(f'{SOURCE_URL}/{_t}/{_file}.csv')
-                else:
-                    _urls.append(f'{SOURCE_URL}/{_type}/{_file}.csv')
-
-    return _urls
+        if len(_download_filenames) < 1:
+            raise RuntimeError(f'No valid download filenames...')
+        else:
+            return _download_filenames
 
 
-# ============================================================================ #
+    def _get_download_urls(self):
+        _urls = []
 
-def get_baseball_databank_data(filenames: list = None) -> None:
-    _filenames = get_download_filenames(filenames)
-    _urls = get_download_urls(_filenames)
+        for filename in self.filenames:
+            for item in self.config['files']:
+                if filename == item['fileName']:
+                    filetype = item['fileType']
 
-    for _url in _urls:
-        Downloader.download(url=_url,
-                            save_dir=os.path.join(DATA_DIR, 'raw'),
-                            ignore_errors=True)
+                    if isinstance(filetype, list):
+                        for t in filetype:
+                            _urls.append(f'{self.source_url}/{t}/{filename}.csv')
+                    else:
+                        _urls.append(f'{self.source_url}/{filetype}/{filename}.csv')
+
+        return _urls
 
 
 # =================================================================================================================== #
