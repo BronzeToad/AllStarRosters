@@ -1,38 +1,45 @@
 import os
-from enum import Enum
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 from dotenv import dotenv_values as dotenvValues
 
 
 # =================================================================================================================== #
 
-class EnvFile(Enum):
-    SECRET = '.env'
-    PYTHON = '.env-py'
+@dataclass
+class EnvHelper:
+    env_dir: Optional[str] = None
+    env_file: Optional[str] = None
 
 
-class EnvironmentHelper:
-
-    def __init__(self, env_file: EnvFile):
-        self.env_file = env_file
-        self._post_init()
-
-
-    def _post_init(self):
-        self.env_dir = os.path.join(Path(__file__).parent.parent, 'environment')
-        self.env_path = os.path.join(self.env_dir, self.env_file.value)
-        self.env_vals_dict = dotenvValues(self.env_path)
+    def __post_init__(self):
+        self.env_dir = self.env_dir or Path(__file__).parent.parent
+        self.env_file = self.env_file or '.env'
+        self.env_path = self._get_env_path()
+        self.env_dict = dotenvValues(self.env_path)
+        self.workspace = self.env_dict['WORKSPACE_DIR']
+        self.pythonpath = self.env_dict['PYTHONPATH']
 
 
-    def get_env_value(self, env_key: str) -> str:
-        _key = env_key.upper()
-        if _key not in self.env_vals_dict:
-            raise KeyError(f'Could not find environment variable {_key} in .env file...')
-        return self.env_vals_dict[_key]
+    def _get_env_path(self) -> str:
+        _path = os.path.join(self.env_dir, self.env_file)
+        if Path(_path).is_file():
+            return _path
+        else:
+            raise FileNotFoundError(f'Environment file {_path} not found.')
+
+
+    def get_env_value(self, env_var: str) -> str:
+        _key = env_var.upper().strip()
+        if _key not in self.env_dict:
+            _abr_path = os.path.join('~', os.path.basename(self.env_dir), self.env_file)
+            raise KeyError(f'Environment variable {_key} not found in {_abr_path}.')
+        return self.env_dict[_key]
 
 
 # =================================================================================================================== #
 
 if __name__ == '__main__':
-    print('\n\n-------------------------- Executing as standalone script...')
+    print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")

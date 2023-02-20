@@ -1,86 +1,55 @@
 import os
+from dataclasses import dataclass, field
 from pathlib import Path
-from enum import Enum, auto
-import requests
 from typing import Optional
 
-import helpers.toad_utils as toadUtils
-from helpers.environment_helper import EnvironmentHelper as EnvHelper, EnvFile
+import requests
 
-import json
+import helpers.toad_utils as toadUtils
+from helpers.environment_helper import EnvHelper
+
+
 # =================================================================================================================== #
 
-
-class ResponseResult(Enum):
-    FAILURE = auto()
-    SUCCESS = auto()
-    UNKNOWN = auto()
-
-
+@dataclass
 class DownloadHelper:
-
-    def __init__(
-        self,
-        url: str,
-        save_dir: str,
-        filename: str = None
-    ):
-        self.url = url
-        self.save_dir = save_dir
-        self.filename = filename
-        self.response = None
-        self.payload = None
-        self.status_code = None
-        self.result = ResponseResult.UNKNOWN
-        self._post_init()
+    url: str
+    save_dir: str
+    filename: Optional[str] = None
+    response: requests.Response = field(init=False, repr=False, default=None)
+    status_code: int = field(init=False, repr=False, default=None)
+    payload: dict = field(init=False, repr=False, default=None)
 
 
-    def _post_init(self):
-        self.root_dir = EnvHelper(EnvFile.PYTHON).get_env_value('WORKSPACE_DIR')
-        self.save_dir = self._get_save_dir()
-        self.filename = self.filename or toadUtils.get_filename_from_url(self.url)
+    def __post_init__(self):
+        self.root_dir = EnvHelper().workspace
+        self.save_dir = self.save_dir or 'downloads'
+        self.save_path = self._get_save_path()
+        self.filename = self.filename or toadUtils.get_url_filename(url=self.url)
 
 
-    def download(self):
+    def download(self) -> None:
         self.response = requests.get(self.url)
-        self.status_code = self._get_status()
-        self._set_result()
-        if self.result == ResponseResult.SUCCESS:
+        self.status_code = self.response.status_code
+
+        if isinstance(self.status_code, int) and self.status_code == 200:
             self.payload = self.response.content
             self._save_content()
-            print(f'Content from {self.url} downloaded successfully.')
-        else:
+        elif isinstance(self.status_code, int) and self.status_code != 200:
             print(f'Request failed with status code {self.status_code}.')
-
-
-    def _get_save_dir(self) -> str:
-        if Path(self.save_dir).is_dir():
-            return self.save_dir
         else:
-            _abs_path = os.path.join(self.root_dir, self.save_dir)
-            if not Path(_abs_path).is_dir():
-                os.makedirs(_abs_path)
-            return _abs_path
+            print(f'Unable to capture content from {self.url}.')
 
 
-    def _get_status(self):
-        return self.response.status_code
-
-
-    def _set_result(self) -> None:
-        if self.status_code is None:
-            self.result = ResponseResult.UNKNOWN
-        elif isinstance(self.status_code, int):
-            if self.status_code == 200:
-                self.result = ResponseResult.SUCCESS
-            else:
-                self.result = ResponseResult.FAILURE
-        else:
-            self.result = ResponseResult.UNKNOWN
+    def _get_save_path(self) -> str:
+        _path = os.path.join(self.root_dir, self.save_dir)
+        if not Path(_path).is_dir():
+            os.makedirs(_path)
+        return _path
 
 
     def _save_content(self):
-        _path = os.path.join(self.save_dir, self.filename)
+        _path = os.path.join(self.save_path, self.filename)
         with open(_path, 'wb') as file:
             file.write(self.payload)
             file.close()
@@ -94,30 +63,4 @@ class DownloadHelper:
 # =================================================================================================================== #
 
 if __name__ == '__main__':
-    print('\n\n-------------------------- Executing as standalone script...')
-
-    URL = ('https://raw.githubusercontent.com/BronzeToad/AllStarRosters/1.2.1/'
-           'data/baseball-almanac/all_star_game_tv_stats.csv')
-
-    ROOT_DIR = EnvHelper(EnvFile.PYTHON).get_env_value('PYTHONPATH')
-    DATA_DIR = os.path.join(ROOT_DIR, 'data', 'baseball-almanac')
-
-    tst = DownloadHelper(url=URL, save_dir=DATA_DIR)
-
-    from icecream import ic
-
-    ic(tst.url)
-    ic(tst.save_dir)
-    ic(tst.filename)
-    ic(tst.response)
-    ic(tst.payload)
-    ic(tst.status_code)
-    ic(tst.result)
-    ic(tst.root_dir)
-    ic(tst.save_dir)
-
-    tst.download()
-    ic(tst.result)
-    ic(tst.response)
-    ic(tst.status_code)
-    ic(tst.payload)
+    print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")

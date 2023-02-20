@@ -1,9 +1,11 @@
 import json
 import os
 from pathlib import Path
+from typing import Optional, Union
 
 import pandas as pd
-from typing import Union
+
+from helpers.enum_factory import FileType
 
 
 # =================================================================================================================== #
@@ -12,56 +14,139 @@ def force_extension(
         filename: str,
         extension: str
 ) -> str:
+    """Force a filename to have a certain extension.
 
-    ext = Path(filename).suffix
-    if ext == '':
-        filename = f'{filename}.{extension}'
-    elif extension not in ext and ext not in extension:
-        raise ValueError(f'Invalid filename extension {ext}. Expected {extension}.')
+    If the filename already has an extension, it must be one of the allowed extensions.
+    If the filename has no extension, the extension is added.
+    If the filename has an extension that is not allowed, an error is raised.
 
-    return filename
+    Parameters
+    ----------
+    filename : str
+        The filename to check.
+    extension : str
+        The desired filename extension.
 
+    Returns
+    -------
+    _filename : str
+        The filename with the desired extension.
 
-def get_json(
-        folder: str,
-        filename: str
-) -> dict:
+    Raises
+    ------
+    ValueError
+        If the filename has an extension that is not allowed.
+    """
+    _ext = str(extension).lower().replace('.', '')
+    _suffix = str(Path(filename).suffix).lower().replace('.', '')
 
-    filename = force_extension(filename, 'json')
-    filepath = f'{os.path.join(folder, filename)}'
-
-    if Path(filepath).is_file():
-        with open(filepath, 'r') as file:
-            data = json.load(file)
+    if _suffix == '':
+        return f'{filename}.{_ext}'
+    elif _ext != _suffix:
+        raise ValueError(f'Invalid filename extension {_suffix}. Expected {_ext}.')
     else:
+        return filename.replace(extension, _ext)
+
+
+def get_file(
+        folder: str,
+        filename: str,
+        file_type: FileType,
+        find_replace: Optional[dict] = None
+) -> Union[dict, str]:
+    """Gets file and loads contents as a python object in memory.
+
+    Parameters
+    ----------
+    folder : str
+        The folder where the file is located.
+    filename : str
+        The name of the file.
+    file_type: FileType,
+        The type of file to be loaded (Enum).
+    find_replace : dict, optional
+        A dictionary of key/value pairs to replace in the file.
+        Only supported for string-like file types for now.
+
+    Returns
+    -------
+    _obj : Union[dict, str]
+        The contents of the sql file.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the file is not found in the given folder.
+    RuntimeError
+        If a find/replace dict is provided for FileType that does not support find/replace.
+    """
+    _filename = force_extension(filename, str(file_type.name).lower())
+    _filepath = f'{os.path.join(folder, _filename)}'
+
+    if not Path(_filepath).is_file():
         raise FileNotFoundError(f'{filename} not found in {folder}.')
 
-    return data
+    with open(_filepath, 'r') as file:
+        if file_type == FileType.JSON:
+            _obj = json.load(file)
+        elif file_type in [FileType.HTML, FileType.SQL]:
+            _obj = str(file.read())
+        else:
+            _obj = None
+        file.close()
+
+    if find_replace is not None:
+        if file_type in [FileType.HTML, FileType.SQL]:
+            for key, val in find_replace.items():
+                _obj = _obj.replace(key, str(val))
+        else:
+            raise RuntimeError(f'Find/Replace not supported for {file_type}')
+
+    return _obj
 
 
-def get_filename_from_url(url: str) -> str:
-    filename = url.split('/')[-1]
-    return url.split('/')[-2] if filename == '' else filename
+def get_url_filename(url: str) -> str:
+    """Extracts the filename from a url. """
+    _filename = url.split('/')[-1]
+    return url.split('/')[-2] if _filename == '' else _filename
 
 
-def get_csv(
+def load_csv(
         folder: str,
         filename: str
 ) -> pd.DataFrame:
+    """Loads a csv file as a dataframe object.
 
-    filename = force_extension(filename, 'csv')
-    filepath = os.path.join(folder, filename)
+    Parameters
+    ----------
+    folder : str
+        The folder where the file is located.
+    filename : str
+        The name of the file.
 
-    if Path(filepath).is_file():
-        df = pd.read_csv(filepath)
-        print(f'Dataframe rows: {df.shape[0]}, Dataframe columns: {df.shape[-1]}')
+    Returns
+    -------
+    _df : pd.DataFrame
+        The contents of the csv file.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the file is not found in the given folder.
+    """
+    _filename = force_extension(filename, 'csv')
+    _path = os.path.join(folder, _filename)
+
+    if Path(_path).is_file():
+        _df = pd.read_csv(_path)
+        print(f'Dataframe shape (rows, cols): {_df.shape}')
     else:
-        raise FileNotFoundError(f'{filename} not found in {folder}.')
+        raise FileNotFoundError(f'{_filename} not found in {folder}.')
 
-    return df
+    return _df
 
 
 # =================================================================================================================== #
 
 if __name__ == '__main__':
-    print('\n\n-------------------------- Executing as standalone script...')
+    print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")

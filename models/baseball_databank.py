@@ -1,87 +1,104 @@
-from helpers.environment_helper import EnvironmentHelper as EnvHelper, EnvFile
-import helpers.toad_utils as ToadUtils
 import os
+from dataclasses import dataclass
+from typing import List, Optional
+
+import helpers.toad_utils as toadUtils
 from helpers.download_helper import DownloadHelper
-from pprint import pprint
-from typing import Union
+from helpers.enum_factory import FileType
+from helpers.environment_helper import EnvHelper
 
 
 # =================================================================================================================== #
 
-
+@dataclass
 class BaseballDatabank:
-    def __init__(
-            self,
-            source_url: str = None,
-            data_dir: str = None,
-            databank_filenames: Union[str, list] = None,
-            config_folder: str = None,
-    ):
-        self.source_url = source_url
-        self.data_dir = data_dir
-        self.databank_filenames = databank_filenames
-        self.config_folder = config_folder
-        self._post_init()
+    source_url: Optional[str] = None
+    save_dir: Optional[str] = None
+    filenames: Optional[List[str]] = None
 
 
-    def _post_init(self):
-        self.root_dir = EnvHelper(EnvFile.PYTHON).get_env_value('PYTHONPATH')
-        self.source_url = self.source_url or 'https://raw.githubusercontent.com/chadwickbureau/baseballdatabank/master'
-        self.data_dir = self.data_dir or os.path.join(self.root_dir, 'data', 'baseball-databank')
-        self.config_folder = self.config_folder or os.path.join(self.root_dir, 'configs')
-        self.config_filenames = ToadUtils.get_json(folder=self.config_folder, filename='databank_filenames')
-        self.config_headers = ToadUtils.get_json(folder=self.config_folder, filename='databank_headers')
-        self.filenames = self._get_databank_filenames()
-        self.urls = self._get_download_urls()
+    def __post_init__(self):
+        self.root_dir = EnvHelper().workspace
+        self.config = self._get_config()
+        self.source_url = self.source_url or self._get_source_url()
+        self.save_dir = self.save_dir or self._get_save_dir()
+        self.filenames = self._get_download_filenames()
+        self.download_urls = self._get_download_urls()
 
 
-    def download(self) -> None:
-        for _url in self.urls:
-            _save_dir = os.path.join(self.data_dir, 'raw')
-            DownloadHelper(url=_url, save_dir=_save_dir).download()
+    def download(self):
+        for url in self.download_urls:
+            downloader = DownloadHelper(
+                    url=url,
+                    save_dir=self.save_dir
+            )
+            downloader.download()
 
 
-    def _get_databank_filenames(self) -> list:
+    def _get_config(self) -> dict:
+        return toadUtils.get_file(
+                folder=os.path.join(self.root_dir, 'configs'),
+                filename='databank_config',
+                file_type=FileType.JSON
+        )
 
-        def _get_valid() -> list:
-            _names = []
-            for _key in self.config_filenames:
-                _name = _key['fileName']
-                _names.append(_name)
-            return _names
 
-        _filenames = self.databank_filenames or _get_valid()
-        _files = [_filenames] if isinstance(_filenames, str) else _filenames
-        _invalid = []
+    def _get_source_url(self) -> str:
+        return self.config['sourceUrl']
 
-        for _file in _files:
-            if _file not in _get_valid():
-                _invalid.append(_file)
-                _files.remove(_file)
 
-            if len(_invalid) > 0:
-                print(f'Removed {len(_invalid)} invalid filenames...')
-                pprint(_invalid)
+    def _get_save_dir(self) -> str:
+        _cfg = self.config['dataDir']
+        _dir = ''
 
-        if len(_files) < 1:
+        if isinstance(_cfg, str):
+            _dir = _cfg
+        else:
+            for i in range(len(_cfg)):
+                _dir = os.path.join(_dir, _cfg[i])
+
+        return _dir
+
+
+    def _get_download_filenames(self) -> List[str]:
+        _valid_filenames = []
+        for f in self.config['files']:
+            _valid_filenames.append(f['fileName'])
+
+        if self.filenames is None:
+            _download_filenames = _valid_filenames
+        else:
+            _download_filenames = [self.filenames] if isinstance(self.filenames, str) else self.filenames
+            _invalid_filenames = []
+
+            for file in _download_filenames:
+                if file not in _valid_filenames:
+                    _invalid_filenames.append(file)
+                    _download_filenames.remove(file)
+
+            if len(_invalid_filenames) > 0:
+                print(f'Removed {len(_invalid_filenames)} invalid filenames...')
+                print([f for f in _invalid_filenames])
+
+        if len(_download_filenames) < 1:
             raise RuntimeError(f'No valid download filenames...')
         else:
-            return _files
+            return _download_filenames
 
 
-    def _get_download_urls(self) -> list:
+    def _get_download_urls(self):
         _urls = []
 
-        for _file in self.filenames:
-            for _item in self.config_filenames:
-                if _file == _item['fileName']:
-                    _type = _item['fileType']
+        for filename in self.filenames:
+            for item in self.config['files']:
+                if filename == item['fileName']:
+                    filetype = item['fileType']
 
-                    if isinstance(_type, list):
-                        for _t in _type:
-                            _urls.append(f'{self.source_url}/{_t}/{_file}.csv')
+                    if isinstance(filetype, list):
+                        for t in filetype:
+                            _urls.append(f'{self.source_url}/{t}/{filename}.csv')
                     else:
-                        _urls.append(f'{self.source_url}/{_type}/{_file}.csv')
+                        _urls.append(f'{self.source_url}/{filetype}/{filename}.csv')
 
         return _urls
 
@@ -89,4 +106,4 @@ class BaseballDatabank:
 # =================================================================================================================== #
 
 if __name__ == '__main__':
-    print('\n\n-------------------------- Executing as standalone script...')
+    print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")
