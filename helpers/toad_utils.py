@@ -3,8 +3,6 @@ import os
 from pathlib import Path
 from typing import Optional, Union
 
-import pandas as pd
-
 from helpers.enum_factory import FileType
 
 
@@ -109,41 +107,6 @@ def get_url_filename(url: str) -> str:
     """Extracts the filename from a url. """
     _filename = url.split('/')[-1]
     return url.split('/')[-2] if _filename == '' else _filename
-
-
-def load_csv(
-        folder: str,
-        filename: str
-) -> pd.DataFrame:
-    """Loads a csv file as a dataframe object.
-
-    Parameters
-    ----------
-    folder : str
-        The folder where the file is located.
-    filename : str
-        The name of the file.
-
-    Returns
-    -------
-    _df : pd.DataFrame
-        The contents of the csv file.
-
-    Raises
-    ------
-    FileNotFoundError
-        If the file is not found in the given folder.
-    """
-    _filename = force_extension(filename, 'csv')
-    _path = os.path.join(folder, _filename)
-
-    if Path(_path).is_file():
-        _df = pd.read_csv(_path)
-        print(f'Dataframe shape (rows, cols): {_df.shape}')
-    else:
-        raise FileNotFoundError(f'{_filename} not found in {folder}.')
-
-    return _df
 
 
 # =================================================================================================================== #

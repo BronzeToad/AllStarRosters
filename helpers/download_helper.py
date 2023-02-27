@@ -14,7 +14,7 @@ from helpers.environment_helper import EnvHelper
 @dataclass
 class DownloadHelper:
     url: str
-    save_dir: str
+    save_dir: Optional[str] = None
     filename: Optional[str] = None
     response: requests.Response = field(init=False, repr=False, default=None)
     status_code: int = field(init=False, repr=False, default=None)
