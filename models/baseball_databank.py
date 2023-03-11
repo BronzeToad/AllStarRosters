@@ -6,7 +6,7 @@ import helpers.toad_utils as toadUtils
 from helpers.download_helper import DownloadHelper
 from helpers.enum_factory import FileType
 from helpers.environment_helper import EnvHelper
-
+from helpers.dataframe_utils import load_csv
 
 # =================================================================================================================== #
 
@@ -107,3 +107,16 @@ class BaseballDatabank:
 
 if __name__ == '__main__':
     print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")
+
+    from icecream import ic
+
+    tst = BaseballDatabank()
+
+    ic(tst.root_dir)
+    ic(tst.config)
+    ic(tst.source_url)
+    ic(tst.save_dir)
+    ic(tst.filenames)
+    ic(tst.download_urls)
+
+    tst.download()
