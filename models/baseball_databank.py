@@ -6,7 +6,7 @@ import helpers.toad_utils as toadUtils
 from helpers.download_helper import DownloadHelper
 from helpers.enum_factory import FileType
 from helpers.environment_helper import EnvHelper
-from configs.config import get_config
+from helpers.config import get_config
 
 # =================================================================================================================== #
 
@@ -69,7 +69,11 @@ class BaseballDatabank:
         if self.download_filenames is None:
             _download_filenames = _valid_filenames
         else:
-            _download_filenames = [self.download_filenames] if isinstance(self.download_filenames, str) else self.download_filenames
+            if isinstance(self.download_filenames, str):
+                _download_filenames = [self.download_filenames]
+            else:
+                _download_filenames = self.download_filenames
+
             _invalid_filenames = []
 
             for file in _download_filenames:
