@@ -7,6 +7,7 @@ class FileType(Enum):
     HTML = auto()
     JSON = auto()
     SQL = auto()
+    INI = auto()
 
 
 class MovingRangeCalc(Enum):

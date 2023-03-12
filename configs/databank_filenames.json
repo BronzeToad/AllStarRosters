@@ -1,10 +1,4 @@
 {
-  "sourceUrl": "https://raw.githubusercontent.com/chadwickbureau/baseballdatabank/master",
-  "dataDir": [
-    "data",
-    "baseball-databank",
-    "raw"
-  ],
   "files": [
     {
       "fileName": "AllstarFull",

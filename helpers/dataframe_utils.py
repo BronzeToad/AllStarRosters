@@ -94,22 +94,14 @@ def update_headers(
 
     _og_cols = list(dataframe.columns)
     _new_cols = list(_df.columns)
-    _missing_cols = []
-    _update_count = 0
+    _updated = 0
 
     for _col in _og_cols:
         if _col not in _new_cols:
-            _update_count += 1
-        else:
-            _missing_cols.append(_col)
+            _updated += 1
 
-    print(f"Updated {_update_count} header {'name' if _update_count == 1 else 'names'}.")
-
-    if drop_missing_cols and len(_missing_cols) > 0:
-        print(f'Dropping {len(_missing_cols)} columns with no matching key in update dictionary...')
-        return drop_columns(_df, _missing_cols)
-    else:
-        return _df
+    print(f'Updated {_updated} of {len(_og_cols)} column names.')
+    return _df
 
 # =================================================================================================================== #
 

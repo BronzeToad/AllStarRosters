@@ -6,7 +6,7 @@ import helpers.toad_utils as toadUtils
 from helpers.download_helper import DownloadHelper
 from helpers.enum_factory import FileType
 from helpers.environment_helper import EnvHelper
-from helpers.dataframe_utils import load_csv
+from configs.config import get_config
 
 # =================================================================================================================== #
 
@@ -14,7 +14,7 @@ from helpers.dataframe_utils import load_csv
 class BaseballDatabank:
     source_url: Optional[str] = None
     save_dir: Optional[str] = None
-    filenames: Optional[List[str]] = None
+    download_filenames: Optional[List[str]] = None
 
 
     def __post_init__(self):
@@ -22,7 +22,9 @@ class BaseballDatabank:
         self.config = self._get_config()
         self.source_url = self.source_url or self._get_source_url()
         self.save_dir = self.save_dir or self._get_save_dir()
-        self.filenames = self._get_download_filenames()
+        self.save_path = os.path.join(self.root_dir, self.save_dir)
+        self.filenames = self._get_filenames()
+        self.download_filenames = self._get_download_filenames()
         self.download_urls = self._get_download_urls()
 
 
@@ -35,29 +37,28 @@ class BaseballDatabank:
             downloader.download()
 
 
-    def _get_config(self) -> dict:
+    @staticmethod
+    def _get_config() -> dict:
+        return get_config(
+                filename='baseball_databank',
+                section='main'
+        )
+
+
+    def _get_filenames(self) -> dict:
         return toadUtils.get_file(
                 folder=os.path.join(self.root_dir, 'configs'),
-                filename='databank_config',
+                filename='databank_filenames',
                 file_type=FileType.JSON
         )
 
 
     def _get_source_url(self) -> str:
-        return self.config['sourceUrl']
+        return self.config['source_url']
 
 
     def _get_save_dir(self) -> str:
-        _cfg = self.config['dataDir']
-        _dir = ''
-
-        if isinstance(_cfg, str):
-            _dir = _cfg
-        else:
-            for i in range(len(_cfg)):
-                _dir = os.path.join(_dir, _cfg[i])
-
-        return _dir
+        return self.config['data_dir']
 
 
     def _get_download_filenames(self) -> List[str]:
@@ -65,10 +66,10 @@ class BaseballDatabank:
         for f in self.config['files']:
             _valid_filenames.append(f['fileName'])
 
-        if self.filenames is None:
+        if self.download_filenames is None:
             _download_filenames = _valid_filenames
         else:
-            _download_filenames = [self.filenames] if isinstance(self.filenames, str) else self.filenames
+            _download_filenames = [self.download_filenames] if isinstance(self.download_filenames, str) else self.download_filenames
             _invalid_filenames = []
 
             for file in _download_filenames:
@@ -89,7 +90,7 @@ class BaseballDatabank:
     def _get_download_urls(self):
         _urls = []
 
-        for filename in self.filenames:
+        for filename in self.download_filenames:
             for item in self.config['files']:
                 if filename == item['fileName']:
                     filetype = item['fileType']
@@ -107,16 +108,3 @@ class BaseballDatabank:
 
 if __name__ == '__main__':
     print(f"\n\n---------------------------------------- {__file__.split('/')[-1]}")
-
-    from icecream import ic
-
-    tst = BaseballDatabank()
-
-    ic(tst.root_dir)
-    ic(tst.config)
-    ic(tst.source_url)
-    ic(tst.save_dir)
-    ic(tst.filenames)
-    ic(tst.download_urls)
-
-    tst.download()
